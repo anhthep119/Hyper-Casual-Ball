@@ -5,7 +5,8 @@ using UnityEngine;
 public class Ball : MonoBehaviour
 {
     private Rigidbody rb;
-    private bool smash;
+    private float currentTime;
+    private bool smash, invincible;
      void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -23,6 +24,29 @@ public class Ball : MonoBehaviour
         smash = true;
         if (Input.GetMouseButtonUp(0))
             smash = false;
+
+            if (invincible)
+            {
+                currentTime -= Time.deltaTime * .35f;
+            }
+            else
+            {
+                if (smash)
+                    currentTime += Time.deltaTime * .8f;
+                else
+                    currentTime -= Time.deltaTime * .5f;
+            }
+            if(currentTime >= 1)
+            {
+                currentTime = 1;
+                invincible = true;
+            }
+            else if(currentTime <= 0)
+            {
+                currentTime = 0;
+                invincible = false;
+            }
+        print(invincible);
     }
     void FixedUpdate()
     {
@@ -43,14 +67,27 @@ public class Ball : MonoBehaviour
             rb.velocity = new Vector3(0, 50 * Time.deltaTime * 5,0);
         }
         else
-            if(target.gameObject.tag == "enemy")
+        {
+            if (invincible)
             {
-                Destroy(target.transform.parent.gameObject);
+                if(target.gameObject.tag == "enemy" || target.gameObject.tag == "plane")
+                {
+                    target.transform.parent.GetComponent<StackController>().ShatterAllParts();
+                }
+                
             }
-            if(target.gameObject.tag == "plane")
+            else
             {
-                Debug.Log("Over");
+                if (target.gameObject.tag == "enemy")
+                {
+                    target.transform.parent.GetComponent<StackController>().ShatterAllParts();
+                }
+                if (target.gameObject.tag == "plane")
+                {
+                    print("Over");
+                }
             }
+        }
     }
     void OnCollisionStay(Collision target)
     {
