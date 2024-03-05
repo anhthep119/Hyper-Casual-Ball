@@ -31,7 +31,9 @@ public class LevelSpawn : MonoBehaviour
                 temp1 = Instantiate(modelPrefab[Random.Range(3, 4)]);
 
             temp1.transform.position = new Vector3(0, i -0.01f,0);
-            temp1.transform.eulerAngles = new Vector3(0, i * 8, 0);            
+            temp1.transform.eulerAngles = new Vector3(0, i * 8, 0);    
+
+            temp1.transform.parent = FindObjectOfType<Rotator>().transform;
         }
         temp2 = Instantiate(WinPrefab);
         temp2.transform.position = new Vector3(0, i - 0.01f, 0);
