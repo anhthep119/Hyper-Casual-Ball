@@ -42,6 +42,15 @@ public class Ball : MonoBehaviour
         {
             rb.velocity = new Vector3(0, 50 * Time.deltaTime * 5,0);
         }
+        else
+            if(target.gameObject.tag == "enemy")
+            {
+                Destroy(target.transform.parent.gameObject);
+            }
+            if(target.gameObject.tag == "plane")
+            {
+                Debug.Log("Over");
+            }
     }
     void OnCollisionStay(Collision target)
     {
