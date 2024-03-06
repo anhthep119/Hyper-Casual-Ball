@@ -17,6 +17,8 @@ public class Ball : MonoBehaviour
     }
     [HideInInspector] 
     public BallState ballState = BallState.Prepare;
+
+    public AudioClip bounceOffClip, deadClip, winClip, destroyClip, iDestroyClip;
      void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -83,8 +85,20 @@ public class Ball : MonoBehaviour
             }
         }
         if(rb.velocity.y > 5)
-        {
             rb.velocity = new Vector3 (rb.velocity.x, 5, rb.velocity.z);
+        
+    }
+    public void IncreaseBrokenStacks()
+    {
+        if(!invincible)
+        {
+            ScoreManager.instance.AddScore(1);
+            SoundManager.instance.PlaySoundFX(destroyClip, 0.5f);
+        }
+        else
+        {
+            ScoreManager.instance.AddScore(2);
+            SoundManager.instance.PlaySoundFX(iDestroyClip, 0.5f);
         }
     }
     void OnCollisionEnter(Collision target)
@@ -92,6 +106,7 @@ public class Ball : MonoBehaviour
         if(!smash)
         {
             rb.velocity = new Vector3(0, 50 * Time.deltaTime * 5,0);
+            SoundManager.instance.PlaySoundFX(bounceOffClip, 0.5f);
         }
         else
         {
@@ -112,12 +127,15 @@ public class Ball : MonoBehaviour
                 if (target.gameObject.tag == "plane")
                 {
                     print("Over");
+                    ScoreManager.instance.ResetSscore();
+                    SoundManager.instance.PlaySoundFX(deadClip, 0.5f);
                 }
             }
         }
         if(target.gameObject.tag == "Finish" && ballState == BallState.Playing)
         {
             ballState = BallState.Finish;
+            SoundManager.instance.PlaySoundFX(winClip, 0.7f);
         }
     }
     void OnCollisionStay(Collision target)
