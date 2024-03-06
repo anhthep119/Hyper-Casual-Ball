@@ -8,6 +8,8 @@ public class Ball : MonoBehaviour
     private float currentTime;
     private bool smash, invincible;
 
+    private int currentBrokenStacks, totalStacks;
+
     public enum BallState
     {
         Prepare,
@@ -22,11 +24,12 @@ public class Ball : MonoBehaviour
      void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        currentBrokenStacks = 0;
     }
     // Start is called before the first frame update
     void Start()
     {
-        
+        totalStacks = FindObjectsOfType<StackController>().Length;
     }
 
     // Update is called once per frame
@@ -90,6 +93,8 @@ public class Ball : MonoBehaviour
     }
     public void IncreaseBrokenStacks()
     {
+        currentBrokenStacks++;
+
         if(!invincible)
         {
             ScoreManager.instance.AddScore(1);
@@ -132,6 +137,9 @@ public class Ball : MonoBehaviour
                 }
             }
         }
+
+        FindObjectOfType<GameUI>().LevelSliderFill(currentBrokenStacks / (float)totalStacks);
+
         if(target.gameObject.tag == "Finish" && ballState == BallState.Playing)
         {
             ballState = BallState.Finish;
