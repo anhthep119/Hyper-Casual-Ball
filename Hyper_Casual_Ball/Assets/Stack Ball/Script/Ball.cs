@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Ball : MonoBehaviour
 {
@@ -9,6 +10,10 @@ public class Ball : MonoBehaviour
     private bool smash, invincible;
 
     private int currentBrokenStacks, totalStacks;
+
+    public GameObject invicnbleObj;
+    public Image invincibleFill;
+    public GameObject FireEffect;
 
     public enum BallState
     {
@@ -45,24 +50,41 @@ public class Ball : MonoBehaviour
             if (invincible)
             {
                 currentTime -= Time.deltaTime * .35f;
+                if(!FireEffect.activeInHierarchy) 
+                    FireEffect.SetActive(true);
             }
             else
             {
+                if(FireEffect.activeInHierarchy)
+                    FireEffect.SetActive(false);
+
                 if (smash)
                     currentTime += Time.deltaTime * .8f;
                 else
                     currentTime -= Time.deltaTime * .5f;
             }
+
+            if (currentTime >= 0.3f || invincibleFill.color == Color.red)
+                invicnbleObj.SetActive(true);
+            else
+                invicnbleObj.SetActive(false);
+               
+
+
             if (currentTime >= 1)
             {
                 currentTime = 1;
                 invincible = true;
+                invincibleFill.color = Color.red;
             }
             else if (currentTime <= 0)
             {
                 currentTime = 0;
                 invincible = false;
+                invincibleFill.color = Color.white;
             }
+            if (invicnbleObj.activeInHierarchy)
+                invincibleFill.fillAmount = currentTime / 1;
         }
         if(ballState == BallState.Prepare)
         {
