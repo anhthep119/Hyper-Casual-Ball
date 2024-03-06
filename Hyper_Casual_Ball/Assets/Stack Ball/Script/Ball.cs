@@ -7,6 +7,16 @@ public class Ball : MonoBehaviour
     private Rigidbody rb;
     private float currentTime;
     private bool smash, invincible;
+
+    public enum BallState
+    {
+        Prepare,
+        Playing,
+        Died,
+        Finish
+    }
+    [HideInInspector] 
+    public BallState ballState = BallState.Prepare;
      void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -20,10 +30,12 @@ public class Ball : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetMouseButtonDown(0))
-        smash = true;
-        if (Input.GetMouseButtonUp(0))
-            smash = false;
+        if(ballState == BallState.Playing) 
+        {
+            if (Input.GetMouseButtonDown(0))
+                smash = true;
+            if (Input.GetMouseButtonUp(0))
+                smash = false;
 
             if (invincible)
             {
@@ -36,24 +48,39 @@ public class Ball : MonoBehaviour
                 else
                     currentTime -= Time.deltaTime * .5f;
             }
-            if(currentTime >= 1)
+            if (currentTime >= 1)
             {
                 currentTime = 1;
                 invincible = true;
             }
-            else if(currentTime <= 0)
+            else if (currentTime <= 0)
             {
                 currentTime = 0;
                 invincible = false;
             }
-        print(invincible);
+        }
+        if(ballState == BallState.Prepare)
+        {
+            if (Input.GetMouseButtonDown(0))
+                ballState = BallState.Playing;
+        }
+        if(ballState == BallState.Finish)
+        {
+            if (Input.GetMouseButtonDown(0))
+                FindObjectOfType<LevelSpawn>().NextLevel();
+        }
+        
+        
     }
     void FixedUpdate()
     {
-        if(Input.GetMouseButton(0))
+       if(ballState == BallState.Playing)
         {
-            smash = true;
-            rb.velocity = new Vector3(0,-100 * Time.fixedDeltaTime * 7, 0);
+            if (Input.GetMouseButton(0))
+            {
+                smash = true;
+                rb.velocity = new Vector3(0, -100 * Time.fixedDeltaTime * 7, 0);
+            }
         }
         if(rb.velocity.y > 5)
         {
@@ -87,6 +114,10 @@ public class Ball : MonoBehaviour
                     print("Over");
                 }
             }
+        }
+        if(target.gameObject.tag == "Finish" && ballState == BallState.Playing)
+        {
+            ballState = BallState.Finish;
         }
     }
     void OnCollisionStay(Collision target)
