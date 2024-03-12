@@ -58,4 +58,5 @@ public class ScoreManager : MonoBehaviour
     {
         score = 0;
     }
+
 }
